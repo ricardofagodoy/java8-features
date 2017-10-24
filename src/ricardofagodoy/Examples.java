@@ -1,80 +1,115 @@
 package ricardofagodoy;
 
-import java.util.*;
+import org.junit.Test;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 public class Examples {
 
-    public void runExamples() {
+    @Test
+    public void functionalInterface() {
 
-        // Functional interface + default methods
         Formula times = (a, b) -> a * b;
 
-        print(times.plusOne(10));
-        print(times.expression(10, 3));
+        assertEquals(30, times.expression(10, 3));
+    }
 
-        // Functional lambda to compare
-        List<Integer> numberList = Arrays.asList(4, 5, 7, 2, 1, 9);
+    @Test
+    public void interfaceDefaultMethod() {
 
-        print(numberList);
+        Formula times = (a, b) -> a * b;
 
-        numberList.sort((a, b) -> a.compareTo(b));
+        assertEquals(11, times.plusOne(10));
+    }
 
-        print(numberList);
+    @Test
+    public void methodAndConstructorReferences() {
 
-        // Method and constructor references
         Person jake = new Person("Jake", 19);
-
         Say saySomething = jake::saySomething;
-        print(saySomething.say());
+
+        assertEquals(jake.saySomething(), saySomething.say());
 
         PersonFactory personFactory = Person::new;
         Person kate = personFactory.create("Kate", 22);
 
-        print(kate.getName());
+        assertEquals("Kate", kate.getName());
+    }
 
-        // Predicate
+    @Test
+    public void predicate() {
+
         Predicate<String> startsWithA = (str) -> str.startsWith("a");
 
-        print(startsWithA.test("abc"));
-        print(startsWithA.test("cba"));
-        print(startsWithA.negate().test("cba"));
+        assertTrue(startsWithA.test("abc"));
+        assertFalse(startsWithA.test("cba"));
 
-        // Functions (nice to chain)
+        assertTrue(startsWithA.negate().test("cba"));
+    }
+
+    @Test
+    public void functions() {
+
         Function<String, Integer> fromStr = Integer::valueOf;
         Function<Integer, Integer> pow2 = (a) -> a * a;
 
         int result = fromStr.andThen(pow2).apply("4");
-        print(result);
 
-        // Suppliers
+        assertEquals(16, result);
+    }
+
+    @Test
+    public void suppliers() {
+
         Supplier<String> stringSupplier = String::new;
+
         String blank = stringSupplier.get();
 
-        // Consumer
-        Consumer<Person> greeter = (p) -> print("Hello, " + p.getName());
+        assertEquals("", blank);
+    }
+
+    @Test
+    public void consumers() {
+
+        Person kate = new Person("Kate", 19);
+
+        Consumer<Person> greeter = (p) -> assertEquals("Kate", p.getName());
         greeter.accept(kate);
 
         Map<Integer, String> numberWord = Collections.singletonMap(1, "one");
-
-        // Also a consumer accepted
         numberWord.forEach((key, val) -> print(key + ": " + val));
+    }
 
-        // Optionals
+    @Test
+    public void optionals() {
+
         Optional<String> optional = Optional.of("bam");
 
-        optional.isPresent();                 // true
-        optional.get();                       // "bam"
-        optional.orElse("fallback");    // "bam"
+        assertTrue(optional.isPresent());
+        assertEquals("bam", optional.get());
 
-        optional.ifPresent((s) -> print(s.charAt(0)));     // "b"
+        assertEquals("bam", optional.orElse("fallback"));
 
-        // Streams
+        optional.ifPresent((s) -> assertEquals("bam", s));
+    }
+
+    @Test
+    public void streams() {
 
         List<String> stringCollection = new ArrayList<>();
+
         stringCollection.add("ddd2");
         stringCollection.add("aaa2");
         stringCollection.add("bbb1");
@@ -129,8 +164,6 @@ public class Examples {
         print(map.getOrDefault(11, "default!!"));
 
         // Also .compute and .merge
-
-        // Clock
     }
 
     private void print(Object str) {
